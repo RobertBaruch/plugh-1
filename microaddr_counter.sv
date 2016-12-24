@@ -1,17 +1,25 @@
+import microaddr_types::uaddr_t;
+
 module microaddr_counter(
-	input logic clk,
-	input logic reset,
-	input logic zflag,
-	input microaddr_types::cmd cmd,
-	input microaddr_types::uaddr load_addr,
-	output microaddr_types::uaddr addr
+	input bit clk,
+	input bit reset,
+	input bit zflag,
+	input byte unsigned M,
+	input microaddr_types::cmd_t cmd,
+	input uaddr_t load_addr,
+	output uaddr_t addr
 );
 
-microaddr_types::uaddr next_addr;
-microaddr_types::uaddr call_stack[4];
-microaddr_types::uaddr next_call_stack[4];
-logic[1:0] call_stack_ptr;
-logic[1:0] next_call_stack_ptr;
+parameter opjump_table_file="";
+
+uaddr_t next_addr;
+uaddr_t call_stack[4];
+uaddr_t next_call_stack[4];
+bit[1:0] call_stack_ptr;
+bit[1:0] next_call_stack_ptr;
+
+uaddr_t opjump_table[256];
+initial $readmemh(opjump_table_file, opjump_table);
 
 always_comb begin
 	next_call_stack_ptr = call_stack_ptr;
@@ -24,10 +32,10 @@ always_comb begin
 		microaddr_types::INC:
 			next_addr = addr + 1;
 
-		microaddr_types::LOAD:
+		microaddr_types::JMP:
 			next_addr = load_addr;
 
-		microaddr_types::LOADNE:
+		microaddr_types::JNZ:
 			next_addr = zflag == 0 ? load_addr : addr + 1;
 
 		microaddr_types::CALL: begin
@@ -40,6 +48,9 @@ always_comb begin
 			next_addr = call_stack[call_stack_ptr - 1];
 			next_call_stack_ptr = call_stack_ptr - 1;
 			end
+
+		microaddr_types::OPJMP:
+			next_addr = opjump_table[M];
 
 		default:
 			next_addr = 0;
