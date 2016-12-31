@@ -3,7 +3,9 @@ import register_types::addr_t;
 module addr_alu(
 	input addr_alu_types::cmd_t cmd,
 	input addr_t x,
+	/* verilator lint_off UNUSED */
 	input addr_t y,
+	/* verilator lint_on UNUSED */
 	output addr_t z,
 	output bit zflag
 );

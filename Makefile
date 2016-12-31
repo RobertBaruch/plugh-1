@@ -1,4 +1,5 @@
-MODULES := microaddr_counter register_file
+MODULES := microaddr_counter register_file alu addr_alu vars 
+
 TYPE_FILES := register_types.sv microaddr_types.sv alu_types.sv \
 	addr_alu_types.sv mem_types.sv plugh_types.sv
 
